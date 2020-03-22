@@ -1,0 +1,30 @@
+---
+title: "Module 4 Template"
+author: "Oliver Engist"
+date: "March 22, 2020"
+output: pdf_document
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+data("Titanic") # load the pre-installed titanic dataset
+data.titanic <- Titanic %>% as_tibble()
+
+glimpse(data.titanic)
+```
+
+```{r}
+data.titanic %<>% select(Class,Sex,Age,Survived) # select only the variables we want
+data.titanic <- map(data.titanic,as.factor) # turn all variables into factors
+data.titanic$Survived %<>% as.numeric()
+```
+
+# Prediction
+
+```{r}
+titanic.fit <- lm(Survived~Class+Sex+Age, data = data.titanic)
+pred <- predict(titanic.fit)
+
+```
+
