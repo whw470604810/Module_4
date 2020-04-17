@@ -15,7 +15,7 @@ I encourage you to take a look at the paper, as we will come back to it later in
 * Change the path of the working directory to your working directory.
 
 ```{r, message=FALSE}
-
+tinytex::install_tinytex()
 library(rio)
 library(tidyverse)
 ```
@@ -51,7 +51,30 @@ joined$factor_nc<-as.factor(joined$totchi)
 # Replicationg Table 1 from the Appendix
 
 We haven't covered regressions in R yet. Use the function *lm()*. The function takes the regression model (formula) and the data as an input. The model is written as $y \sim x$, where $x$ stands for any linear combination of regressors (e.g. $y \sim x_1 + x_2 + female$). Use the help file to understand the function.
-
+```{r}
+reg<-lm(totchi~genold+.,data=joined)
+beta_1<-coef(reg)[c(2,3)]
+dem<-joined[joined$party=='D',]
+dem$party<-NULL
+rep<-joined[joined$party=='R',]
+rep$party<-NULL
+reg_dem<-lm(totchi~.,data=dem)
+beta_1_dem<-coef(reg)[c(2,3)]
+reg_rep<-lm(totchi~.,data=rep)
+beta_1_rep<-coef(reg)[c(2,3)]
+std<-sqrt(diag(vcov(reg)))[c(2,3)]
+std_dem<-sqrt(diag(vcov(reg_dem)))[c(15,16)]
+std_rep<-sqrt(diag(vcov(reg_rep)))[c(14,15)]
+std_total<-append(std,std_dem)
+std_total<-append(std_total,std_rep)
+beta_1_total<-append(beta_1,beta_1_dem)
+beta_1_total<-append(beta_1,beta_1_rep)
+```
+```{r}
+full_ind<-coef(reg)[-1]
+dem_ind<-coef(reg_dem)[-1]
+rep_ind<-coef(reg_rep)[-1]
+```
 * Run the regression $total.children = \beta_0 + \beta_1 gender.oldest + \gamma'X$ where $\gamma$ stands for a vector of coefficients and $X$ is a matrix that contains all columns that are control variables.\footnote{This is just a short notation instead of writing the full model with all control variables $totchi = \beta_0 + \beta_1 genold + \gamma_1 age + \gamma_2 age^2 + \gamma_3 Democrat + ... + \epsilon$ which quickly gets out of hand for large models.}
 * Save the main coefficient of interest ($\beta_1$)
 * Run the same regression separately for Democrats and Republicans (assign the independent to one of the parties). Save the coefficient and standard error of *genold*
