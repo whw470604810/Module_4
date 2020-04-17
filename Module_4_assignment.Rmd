@@ -24,8 +24,22 @@ library(tidyverse)
 * create a subset of the 108th congress from the *basic* dataset
 * join this subset with the *genold* dataset
 
+```{r}
+basic<-as_tibble(import('basic.dta'))
+genold<-as_tibble(import('genold108.dta'))
+congress_108<-basic[basic$congress==108,]
+joined<-inner_join(genold,congress_108,by='name')
+```
 # Data preparation
-
+```{r}
+joined<-joined[,c('anygirls','ngirls','totchi','white','female','age','srvlng','rgroup','demvote','aauw','rtl','party','genold')]
+joined$genold<-as.factor(joined$genold)
+joined$party<-factor(joined$party,labels=c('D','R','I'))
+joined$rgroup<-as.factor(joined$rgroup)
+joined$agesqured<-joined$age^2
+joined$svlngsqured<-joined$srvlng^2
+joined$factor_nc<-as.factor(joined$totchi)
+```
 * check table 1 in the appendix of the paper and decide which variables are necessary for the analysis (check the footnote for control variables)
 * drop all other variables.
 * Recode *genold* such that gender is a factor variable and missing values are coded as NAs.
